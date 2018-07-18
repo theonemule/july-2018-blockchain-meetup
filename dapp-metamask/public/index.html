@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<title>Vote App</title>
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+
+<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+
+<script type="text/javascript">
+
+	var address = "0x345ca3e014aaf5dca488057592ee47305d9b3e10";
+	var abi =  [
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "candidate1",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "candidate2",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "voted",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "candidate",
+          "type": "uint256"
+        }
+      ],
+      "name": "castVote",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ];
+
+	var voteContract;
+
+    function castVote(candidate) {
+        voteContract.castVote(candidate, function(err,res){
+            if(err){
+              alert("Error casting vote.")
+            }else{
+              alert("Vote cast!")
+            }
+        })
+    }
+	
+	function getVoteCount(){
+      voteContract.candidate1(function(err,res){
+          if(!err){
+            document.getElementById("votes1").innerHTML = res.c[0];
+          }
+      })
+
+      voteContract.candidate2(function(err,res){
+          if(!err){
+            document.getElementById("votes2").innerHTML = res.c[0];
+          }
+      })
+
+	}
+
+	function init(){
+    if (typeof web3 !== 'undefined') {
+      voteContract = web3.eth.contract(abi).at(address);
+      setInterval(function(){ getVoteCount(); }, 1000);
+    } else {
+      alert("Could not found web3! Please install MetaMask")
+    }
+  
+	}
+
+</script>
+</head>
+
+<body onload="init()">
+	<div class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="row">
+				<div class="navbar-header">
+					<a class="navbar-brand" href="/">
+						Vote App
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="container" id="professors" style="margin-top: 60px">
+		<div class="row">
+			<div class="col-md-6 text-center">
+				<button onclick="castVote(1)">
+				<img src="/img/clinton.jpg" style="max-width:200px">
+				<h1>Vote Clinton</h1>
+				</button>
+				<h2>Votes: <span id="votes1"></span></h2>
+			</div>		
+			<div class="col-md-6 text-center">
+				<button onclick="castVote(2)">
+				<img src="/img/trump.jpg" style="max-width:200px">
+				<h1>Vote Trump</h1>
+				</button>
+				<h2>Votes: <span id="votes2"></span></h2>
+			</div>
+
+		</div>
+		
+	</div>
+</body>
+</html>

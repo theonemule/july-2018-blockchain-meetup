@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<title>Vote App</title>
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+
+<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+<script type="text/javascript">
+	var webServerURL = "http://localhost:8080";
+	
+
+    function castVote(candidate) {
+        formData = "candidate=" + encodeURIComponent(candidate);
+        formData += "&account=" + encodeURIComponent(document.getElementById("account").value)
+
+        callXHR("POST", webServerURL + "/vote", formData, function(err, data) {
+			if(err){
+				alert("Error: " + err)
+			}else{
+				alert("Vote cast!");
+				counts();
+			}
+        });
+    }
+	
+	function getVoteCount(candidate){
+		callXHR("GET", webServerURL + "/count/" + candidate, null, function(err, data){
+			if(!err){
+				document.getElementById("votes" + candidate).innerHTML = data;
+			}else{
+				console.log(err);
+			}
+		})
+	}
+
+	function counts(){
+		getVoteCount(1);getVoteCount(2);
+	}
+
+	function callXHR(method, URL, formData, callback) {
+		var request = new XMLHttpRequest();
+		request.open(method, URL);
+
+		if (method == "POST") {
+			request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+			request.send(formData);
+		}
+		else {
+			request.send();
+		}
+		
+		request.onreadystatechange = function() {
+			if (request.readyState == 4 && request.status < 300) {
+				callback(null, JSON.parse(request.responseText));
+			}
+			else if (request.readyState == 4 && request.status >= 300) {
+				callback(request.responseText, null);
+			}
+		};    
+	}
+</script>
+</head>
+
+<body onload="counts()">
+	<div class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="row">
+				<div class="navbar-header">
+					<a class="navbar-brand" href="/">
+						Vote App
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="container" id="professors" style="margin-top: 60px">
+		<div class="row">
+			<div class="col-md-12 text-center">
+			<h1>Account Address: <input type="text" id="account"></h1>
+			</div>
+			
+		</div>
+		
+	</div>
+	<div class="container" id="professors" style="margin-top: 60px">
+		<div class="row">
+			<div class="col-md-6 text-center">
+				<button onclick="castVote(1)">
+				<img src="/img/clinton.jpg" style="max-width:200px">
+				<h1>Vote Clinton</h1>
+				</button>
+				<h2>Votes: <span id="votes1"></span></h2>
+			</div>		
+			<div class="col-md-6 text-center">
+				<button onclick="castVote(2)">
+				<img src="/img/trump.jpg" style="max-width:200px">
+				<h1>Vote Trump</h1>
+				</button>
+				<h2>Votes: <span id="votes2"></span></h2>
+			</div>
+
+		</div>
+		
+	</div>
+</body>
+</html>
